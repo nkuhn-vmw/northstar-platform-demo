@@ -17,6 +17,8 @@ class FakeCF(CF):
         self.fail_after_create_kind = None
         self.broker_failure = None
         self.missing_plan = None
+        self.missing_stack = False
+        self.buildpack_stack = None
         self.visibility = {'type': 'public'}
         self.manifests = {}
         self.target_switches = []
@@ -48,7 +50,7 @@ class FakeCF(CF):
             'routes': {'hosts', 'space_guids', 'domain_guids', 'label_selector'},
             'service_credential_bindings': {'app_guids', 'service_instance_guids', 'label_selector'},
             'service_offerings': {'names'}, 'service_plans': {'names', 'service_offering_guids'},
-            'buildpacks': set(), 'domains': {'names'}, 'spaces': {'names', 'organization_guids'},
+            'buildpacks': set(), 'stacks': {'names'}, 'domains': {'names'}, 'spaces': {'names', 'organization_guids'},
         }
         unsupported = set(query) - supported[kind]
         if unsupported:
@@ -63,8 +65,10 @@ class FakeCF(CF):
             if query['names'] == self.missing_plan:
                 return []
             return [{'guid': 'plan-' + query['names'], 'name': query['names'], 'free': True}]
+        if kind == 'stacks':
+            return [] if self.missing_stack else [{'name': query['names']}]
         if kind == 'buildpacks':
-            return [{'name': v, 'enabled': True, 'state': 'READY'} for v in self.config['buildpacks'].values()]
+            return [{'name': v, 'enabled': True, 'state': 'READY', 'stack': self.buildpack_stack} for v in self.config['buildpacks'].values()]
         if kind == 'domains':
             return [{'guid': query['names'], 'name': query['names']}]
         if kind == 'spaces':

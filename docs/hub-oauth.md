@@ -54,7 +54,7 @@ never share them in the portable source kit. Use separate files and registration
 for a different gateway or phase-space prefix. For phase-spaces deployments, pass
 the same `--mode phase-spaces --phase N` to registration and lifecycle commands.
 TLS validation remains enabled. When retiring an installation, ask its Hub operator
-to remove its OAuth client; CF cleanup does not deregister that Hub client.
+to remove its OAuth client; CF cleanup does not deregister that Hub client. Default cleanup also retains the local Hub OAuth service and its client secret; see [cleanup and data retention](reset.md).
 
 ## Presenter consent and read-only acceptance
 
@@ -68,7 +68,7 @@ app, successful consent or discovered tool list alone is not inventory acceptanc
 SSO and CF roles are environment-specific. An empty resource picker means the
 presenter needs appropriate access to the store's space; the kit does not grant
 roles. An identity-provider callback error needs an operator to register the exact
-HTTPS callback. Never widen redirects to a wildcard or use a shared personal token.
+HTTPS callback for that Hub/gateway flow. Never widen those callbacks to a wildcard or use a shared personal token. The separate native agent SSO client uses a redirect pattern restricted to its own exact application origin to support the platform runtime's login paths.
 If a connection is not ready, switch it off in your session to keep other scenes
 usable. Hub retains the user's existing permissions; the demo's read-only prompt
 is not an authorization boundary for every tool Hub may expose.

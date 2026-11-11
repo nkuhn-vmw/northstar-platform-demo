@@ -332,8 +332,9 @@ def prepare_all(
     return records
 
 
-def check_all(root: Path, dependencies: List[Dict[str, Any]]) -> None:
-    validate_prerequisites(root, dependencies)
+def check_all(root: Path, dependencies: List[Dict[str, Any]], *, require_toolchains: bool = True) -> None:
+    if require_toolchains:
+        validate_prerequisites(root, dependencies)
     state_path = root / ".artifacts" / "prepare-state.json"
     try:
         state = json.loads(state_path.read_text(encoding="utf-8"))

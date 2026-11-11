@@ -40,6 +40,9 @@ class LifecycleTests(unittest.TestCase):
         assets_patch = patch('northstar_kit.lifecycle.assets', return_value=[asset_root])
         assets_patch.start()
         self.addCleanup(assets_patch.stop)
+        integrity_patch = patch('northstar_kit.lifecycle.verify_prepared_assets')
+        self.integrity = integrity_patch.start()
+        self.addCleanup(integrity_patch.stop)
         self.cf = FakeCF(self.config)
         self.state = State(Path(self.tmp.name) / 'state', self.config['target'])
         self.lock = self.state.locked()
@@ -48,6 +51,23 @@ class LifecycleTests(unittest.TestCase):
 
     def lifecycle(self, phase=4):
         return Lifecycle(self.config, phase, 'cumulative', self.cf, self.state, probe=lambda url, **kwargs: 401 if kwargs.get('method') == 'POST' else 200 if url.endswith('/health') else 302)
+
+    def test_preflight_rejects_invalid_artifacts_before_remote_mutation(self):
+        self.integrity.side_effect = CFError('prepared artifact verification failed')
+        with self.assertRaisesRegex(CFError, 'artifact verification failed'):
+            self.lifecycle().deploy()
+        self.assertEqual(self.cf.mutations, [])
+
+    def test_native_stack_and_buildpack_are_checked_before_provisioning(self):
+        self.cf.missing_stack = True
+        with self.assertRaisesRegex(CFError, 'required stack missing'):
+            self.lifecycle().deploy()
+        self.assertEqual(self.cf.mutations, [])
+        self.cf.missing_stack = False
+        self.cf.buildpack_stack = 'incompatible-stack'
+        with self.assertRaisesRegex(CFError, 'incompatible with stack'):
+            self.lifecycle().deploy()
+        self.assertEqual(self.cf.mutations, [])
 
     def test_native_memory_and_credential_store_bind_without_publisher_adapter(self):
         self.config['buildpacks']['agent'] = 'agent_buildpack'
@@ -355,6 +375,8 @@ class LifecycleTests(unittest.TestCase):
         sso_guid = self.state.data['resources']['sso']['guid']
         before = self.cf.list('service_credential_bindings', app_guids=app_guid, service_instance_guids=sso_guid)[0]['guid']
         self.config['sso']['agent_scopes'] = 'openid'
+        self.config['sso']['allowed_emails'] = ['another@corp.test']
+        self.config['sso']['allow_unverified_email'] = True
         self.lifecycle(1).deploy()
         self.assertEqual(self.cf.list('service_credential_bindings', app_guids=app_guid, service_instance_guids=sso_guid)[0]['guid'], before)
         self.config['sso']['identity_provider'] = 'second-corp'

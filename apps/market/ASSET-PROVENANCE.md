@@ -11,5 +11,4 @@ product packaging text, trademarks, or borrowed ACME Fitness assets.
 | `bakery-meals.png` | Artisan bread, croissants, grain bowl, and ready-to-cook meal kit in unbranded sustainable packaging |
 | `fulfillment.png` | Reusable insulated grocery totes at a clean curbside pickup station with an unbranded delivery van |
 
-The original generated files remain under the local Codex generated-images directory.
-The application consumes copies stored beside its static frontend assets.
+The four generated PNG files are included beside the application's static frontend assets; no external image directory is required.

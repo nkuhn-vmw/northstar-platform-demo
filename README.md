@@ -20,6 +20,8 @@ bin/prepare
 bin/verify
 ```
 
+Before deployment, review the [current upstream proxy finding and operator decision](docs/verification.md#built-artifact-security-assessment).
+
 The plan is local and does not log in or modify a foundation. Deployment requires the explicit `deploy --apply` command, a matching CF target, and successful preflight checks.
 
 ## Present the story

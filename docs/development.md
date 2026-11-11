@@ -12,7 +12,7 @@ Preparation downloads the official oauth2-proxy Linux/amd64 release and checks b
 
 `bin/verify --static` checks local documentation links, source/archive pins, JSON/Python/shell syntax, and native topology/manifest closure. Full verification also checks prepared outputs, runs the retained Python orchestration and launcher regressions, both Go suites, and the Market integration suite. It never logs into CF, creates an OAuth client, or invokes a model. A fresh clone must pass without private repositories or credentials.
 
-`bin/prepare --offline DIRECTORY` accepts the pinned oauth2-proxy archive from an operator-provided directory. It also requires populated Gradle caches and the toolchains already installed. This option does not claim network isolation. Runtime model, identity and optional Hub endpoints are online services.
+`bin/prepare --offline DIRECTORY` accepts the pinned oauth2-proxy archive from an operator-provided directory. It also requires populated Gradle caches and the toolchains already installed. Set `GRADLE_USER_HOME="$PWD/.artifacts/gradle-home"` for both preparation and verification when sharing an offline cache; otherwise Gradle preparation uses its normal user cache while verification defaults to the kit cache. This option does not claim network isolation. Runtime model, identity and optional Hub endpoints are online services.
 
 ## Local browser preview
 
@@ -30,3 +30,5 @@ For Market, run `./gradlew bootRun` in `apps/market` and open `http://localhost:
 Use maintained tools such as Gitleaks for Git/source secrets and Trivy's `rootfs --scanners vuln` for prepared JARs and Go executables. The `fs` analyzer alone may not inventory those binaries. Record artifact hashes, scanner/database dates and vendor applicability; package matches do not by themselves prove exploitability. Upgrade official dependencies and rerun the affected flows. Do not suppress findings just to make CI green.
 
 The public candidate's actual checks and limitations are recorded in [verification](verification.md). CI does not deploy or use foundation credentials. Dependency update configuration covers Gradle, Go and GitHub Actions; oauth2-proxy's release/hash ledger requires an explicit reviewed update.
+
+Dependency-update pull requests that change a source tree also require updating its deliberate `tree_sha256` pin and preparing again; CI will fail until those reviewed changes agree. Dependabot does not update this project-specific ledger automatically.

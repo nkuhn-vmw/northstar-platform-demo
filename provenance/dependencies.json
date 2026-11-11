@@ -27,7 +27,7 @@
       "version": "native-public-example-2026-11-11",
       "source": {
         "path": "apps/market",
-        "tree_sha256": "751936a48f3fefcab5c6c0394ee00563ae219919a87a63f354b16df619a30092",
+        "tree_sha256": "b43a97929b90d4479b9b8af69cd94a8461d55344f7075c8dee5f211170a2a7aa",
         "license": "Apache-2.0",
         "notice_file": "apps/market/ASSET-PROVENANCE.md",
         "license_file": "LICENSE"

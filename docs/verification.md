@@ -5,12 +5,12 @@ Checked on 11 November 2026. This is a source release candidate; authenticated a
 ## Local checks completed
 
 - Prepared all four Linux/amd64 artifacts, verified official archive/executable hashes, source-tree pins and output digests.
-- Passed 67 Python orchestration, ownership, credential handling and launcher checks; both Go test suites; four Market integration tests on Java 21 / Spring Boot 4.1.2. `bin/verify --offline` passed with populated caches.
-- Checked the native phase/mode plans with Hub enabled and disabled, source syntax, package boundaries and 27 local documentation links.
+- Passed 69 Python orchestration, ownership, credential handling and launcher checks; both Go test suites; four Market integration tests on Java 21 / Spring Boot 4.1.2. `bin/verify --offline` passed with populated caches.
+- Checked the native phase/mode plans with Hub enabled and disabled, source syntax, package boundaries and 32 local documentation links.
 - Interactively checked the loopback presenter guide, native architecture diagram and endpoint filtering. The rebuilt Market served its synthetic catalog and Produce filter returned three products. These were unauthenticated local previews.
-- Gitleaks 8.30.1 reported no findings in the selected source export. Old repository history, local profiles, state, credentials, logs and build caches are excluded from this new repository.
+- Gitleaks 8.30.1 reported no findings in the selected source export or initial clean Git history. Old repository history, local profiles, state, credentials, logs and build caches are excluded from this new repository.
 
-Fresh-clone CI and final independent review are pending. This file will be updated with their actual results. Every deployment must complete the signed-in checks in [the deployment guide](deploy.md).
+Independent review found no code-level release blocker. Its deployment-risk and cleanup documentation findings were corrected; artifact integrity, stack compatibility and runtime-only SSO configuration also received focused fixes and regression checks. A bounded follow-up found no actionable defects in the integrity and stack gates. The initial clean-history commit passed [fresh-clone CI](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/runs/43069816932); use the [latest workflow run](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/workflows/verify.yml) for the current source revision. Every deployment must complete the signed-in checks in [the deployment guide](deploy.md).
 
 ## Built-artifact security assessment
 

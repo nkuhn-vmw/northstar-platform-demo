@@ -4,8 +4,10 @@ This repository is a demonstration source kit, not a supported platform distribu
 Use a current compatible platform and verify service access, identity trust and
 runtime versions in your own environment.
 
-Please report suspected vulnerabilities privately through this repository's
-GitHub **Security → Report a vulnerability** form. Do not post credentials,
+For public releases, report suspected vulnerabilities privately through this repository's
+GitHub **Security → Report a vulnerability** form. That form must be enabled when
+the repository is published. During private evaluation, contact your installation
+owner through your organization's private security channel. Do not post credentials,
 private deployment logs, tokens or personal data in public issues. Include the
 source commit, affected component and a sanitized reproduction.
 
@@ -16,3 +18,5 @@ reported through your platform vendor's security channel.
 Credential files, local profiles and deployment journals are ignored. Never
 commit them. Preserve TLS checks and exact SSO admission. Hub uses the presenter's
 existing permissions; a read-only prompt is not an authorization boundary.
+
+Before deploying, review the [current artifact findings](docs/verification.md#built-artifact-security-assessment), including the unresolved HTTP/1 denial-of-service advisory in the official SSO proxy. Build/CI success does not accept that risk for an operator.

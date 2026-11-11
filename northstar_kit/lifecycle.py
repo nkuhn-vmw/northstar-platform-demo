@@ -1,6 +1,7 @@
 """Read-only gates, owned CF reconciliation, and evidence-level validation."""
 import hashlib
 import json
+import runpy
 import shutil
 import ssl
 import urllib.error
@@ -13,6 +14,14 @@ from .state import digest
 from .topology import omitted_scenes, resolve
 
 OWNER = 'northstar-kit-owner'
+
+
+def verify_prepared_assets(root):
+    checker = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'bin/prepare'))
+    try:
+        checker['check_all'](root, checker['_load_dependencies'](root), require_toolchains=False)
+    except (checker['PrepareError'], OSError, ValueError) as error:
+        raise CFError('prepared artifact verification failed: ' + str(error) + '; run bin/prepare') from None
 
 
 def http_status(url, method='GET', data=None, headers=None):
@@ -101,6 +110,7 @@ class Lifecycle:
         missing = [str(p.relative_to(ROOT)) for p in assets(self.records, self.config, self.phase) if not p.exists()]
         if missing:
             raise CFError('missing prepared assets: ' + ', '.join(missing) + '; run bin/prepare')
+        verify_prepared_assets(ROOT)
         checks.append({'check': 'local-assets', 'status': 'pass'})
         needed = {r.get('service', 'credentials') for r in self.records if not r.get('user_provided') and (r['kind'] in ('service', 'credential') or r.get('secret'))}
         for key in sorted(needed):
@@ -125,9 +135,13 @@ class Lifecycle:
         buildpacks = self.cf.list('buildpacks')
         for record in self.records:
             if record['kind'] == 'app':
-                buildpack = manifest(self.config, record, self.phase, self.names)['applications'][0]['buildpacks'][0]
-                if not any(b['name'] == buildpack and b.get('enabled', True) and b.get('state', 'READY') == 'READY' for b in buildpacks):
-                    raise CFError('buildpack missing/disabled: ' + buildpack)
+                spec = manifest(self.config, record, self.phase, self.names)['applications'][0]
+                buildpack, stack = spec['buildpacks'][0], spec.get('stack')
+                if stack and not self.cf.list('stacks', names=stack):
+                    raise CFError('required stack missing: ' + stack)
+                if not any(b['name'] == buildpack and b.get('enabled', True) and b.get('state', 'READY') == 'READY'
+                           and (not stack or b.get('stack') in (None, stack)) for b in buildpacks):
+                    raise CFError('buildpack missing/disabled or incompatible with stack: ' + buildpack)
         for domain in set(self.config['routes'].values()):
             found = self.cf.list('domains', names=domain)
             if len(found) != 1:
@@ -175,7 +189,7 @@ class Lifecycle:
                 kind = 'apps' if record['kind'] == 'app' else 'service_instances'
                 if self.cf.list(kind, names=record['name'], space_guids=self.identity['space_guid']):
                     raise CFError('cannot disable existing integration ' + flag +
-                                  '; use the original profile for cleanup --delete-data, or a new prefix; see docs/operations/reset.md')
+                                  '; use a new prefix to preserve data, or the original profile for cleanup --delete-data (deletes ALL owned service data, including memory and Credential Store grants); see docs/reset.md')
 
     def check_quotas(self):
         """CAPI 3.212 usage summaries, including managed services (not UPS)."""
@@ -336,7 +350,7 @@ class Lifecycle:
         if service_id == 'sso':
             # agent_scopes configures the runtime, not the broker's registered
             # scopes. A runtime-only change must not rotate an existing client.
-            broker_sso = {k: v for k, v in self.config['sso'].items() if k not in ('agent_scopes', 'allow_unverified_email')}
+            broker_sso = {k: v for k, v in self.config['sso'].items() if k not in ('agent_scopes', 'allow_unverified_email', 'allowed_emails')}
             binding_fingerprint = digest([binding_fingerprint, broker_sso])
         gateway_hub = service_id == 'gateway' and app['name'] == self.names.get('hub-relay')
         if gateway_hub:

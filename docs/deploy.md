@@ -45,7 +45,9 @@ bin/demo --config my-foundation.local.json plan --phase 4 --json
 bin/demo --config my-foundation.local.json preflight --phase 4 --json
 ```
 
-Inspect the exact target and planned app/service names. Preflight checks plan access, installed buildpacks, domains, ownership collisions and CF quotas. An operator must separately confirm broker/model capacity and staging headroom; a quota response cannot establish those.
+Inspect the exact target and planned app/service names. Preflight checks prepared artifact/source digests without requiring build toolchains, plan access, the native stack and matching buildpacks, domains, ownership collisions and CF quotas. An operator must separately confirm broker/model capacity and staging headroom; a quota response cannot establish those.
+
+**Before deployment:** review the [unresolved oauth2-proxy finding](verification.md#built-artifact-security-assessment) and make an explicit operator risk decision. The proxy is the public HTTP listener for Copilot and the guide; the Go advisory concerns a possible HTTP/1 panic and restart (denial of service), not an identified authentication bypass. No fixed official proxy binary was available on the assessment date. Do not treat passing preflight or CI as acceptance of that risk.
 
 ```sh
 bin/demo --config my-foundation.local.json deploy --phase 4 --apply

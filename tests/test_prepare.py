@@ -67,6 +67,12 @@ class PrepareTests(unittest.TestCase):
             state = json.loads((root / ".artifacts" / "prepare-state.json").read_text())
             self.assertEqual(state["target"], "linux/amd64")
             prepare.check_all(root, [dependency])
+            from unittest.mock import patch
+            with patch.object(prepare, 'validate_prerequisites', side_effect=AssertionError('no build tools on deploy host')):
+                prepare.check_all(root, [dependency], require_toolchains=False)
+                output.write_bytes(b'tampered')
+                with self.assertRaisesRegex(prepare.PrepareError, 'SHA-256 mismatch'):
+                    prepare.check_all(root, [dependency], require_toolchains=False)
 
     def test_offline_preparation_rejects_hash_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as root_name, tempfile.TemporaryDirectory() as offline_name:
