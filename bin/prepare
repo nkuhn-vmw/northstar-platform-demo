@@ -1,0 +1,422 @@
+#!/usr/bin/env python3
+"""Prepare pinned Linux runtime artifacts for the Northstar demo kit."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tarfile
+import tempfile
+from typing import Any, Dict, Iterable, List, Optional
+import urllib.request
+
+
+class PrepareError(RuntimeError):
+    """A safe, user-facing preparation failure."""
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def source_tree_sha256(path: Path) -> str:
+    """Hash sorted `sha256  ./relative-path` records for a source tree."""
+    if not path.is_dir():
+        raise PrepareError(f"source directory is missing: {path}")
+    records = bytearray()
+    ignored = {".gradle", "build", "target", "bin", "dist", "__pycache__"}
+    files = sorted(
+        item
+        for item in path.rglob("*")
+        if item.is_file() and not any(part in ignored for part in item.relative_to(path).parts)
+    )
+    if not files:
+        raise PrepareError(f"source directory is empty: {path}")
+    for item in files:
+        relative = item.relative_to(path).as_posix()
+        records.extend(f"{sha256_file(item)}  ./{relative}\n".encode("utf-8"))
+    return hashlib.sha256(records).hexdigest()
+
+
+def _require_digest(path: Path, expected: str, description: str) -> None:
+    actual = sha256_file(path)
+    if actual != expected:
+        raise PrepareError(
+            f"{description} SHA-256 mismatch: expected {expected}, got {actual}"
+        )
+
+
+def _mode(value: str) -> int:
+    try:
+        result = int(value, 8)
+    except (TypeError, ValueError) as error:
+        raise PrepareError(f"invalid output mode {value!r}") from error
+    if result & ~0o777:
+        raise PrepareError(f"invalid output mode {value!r}")
+    return result
+
+
+def _atomic_output_path(destination: Path) -> Path:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", dir=str(destination.parent)
+    )
+    os.close(descriptor)
+    os.chmod(name, 0o600)
+    return Path(name)
+
+
+def _install_tar_member(
+    archive: Path, member_name: str, destination: Path, expected_sha256: str, mode: int
+) -> None:
+    temporary = _atomic_output_path(destination)
+    try:
+        with tarfile.open(archive, mode="r:gz") as bundle:
+            try:
+                member = bundle.getmember(member_name)
+            except KeyError as error:
+                raise PrepareError(
+                    f"archive {archive.name} does not contain {member_name}"
+                ) from error
+            if not member.isfile():
+                raise PrepareError(f"archive member is not a regular file: {member_name}")
+            extracted = bundle.extractfile(member)
+            if extracted is None:
+                raise PrepareError(f"could not read archive member: {member_name}")
+            with temporary.open("wb") as output:
+                shutil.copyfileobj(extracted, output)
+        _require_digest(temporary, expected_sha256, f"installed {destination.name}")
+        os.chmod(temporary, mode)
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def _download(url: str, destination: Path) -> None:
+    request = urllib.request.Request(url, headers={"User-Agent": "northstar-demo-kit/prepare"})
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            with destination.open("wb") as output:
+                shutil.copyfileobj(response, output)
+    except Exception as error:
+        destination.unlink(missing_ok=True)
+        raise PrepareError(f"download failed for {url}: {error}") from error
+
+
+def prepare_release(
+    root: Path, dependency: Dict[str, Any], offline_dir: Optional[Path]
+) -> Dict[str, str]:
+    source = dependency["source"]
+    output = dependency["output"]
+    destination = root / output["path"]
+    if destination.is_file():
+        if (
+            sha256_file(destination) == output["sha256"]
+            and stat.S_IMODE(destination.stat().st_mode) == _mode(output["mode"])
+        ):
+            return {"output_sha256": output["sha256"]}
+    filename = source["archive_filename"]
+    with tempfile.TemporaryDirectory(prefix="northstar-prepare-") as temporary_name:
+        temporary_dir = Path(temporary_name)
+        os.chmod(temporary_dir, 0o700)
+        archive = temporary_dir / filename
+        if offline_dir is not None:
+            offline_archive = offline_dir / filename
+            if not offline_archive.is_file():
+                raise PrepareError(f"offline artifact is missing: {offline_archive}")
+            shutil.copyfile(offline_archive, archive)
+        else:
+            _download(source["url"], archive)
+        os.chmod(archive, 0o600)
+        _require_digest(archive, source["archive_sha256"], f"archive {filename}")
+        _install_tar_member(
+            archive,
+            dependency["archive_member"],
+            destination,
+            output["sha256"],
+            _mode(output["mode"]),
+        )
+    return {"output_sha256": output["sha256"]}
+
+
+def prepare_go_build(root: Path, dependency: Dict[str, Any]) -> Dict[str, str]:
+    source = dependency["source"]
+    source_dir = root / source["path"]
+    source_digest = source_tree_sha256(source_dir)
+    if source_digest != source["tree_sha256"]:
+        raise PrepareError(
+            f"{dependency['id']} source SHA-256 mismatch: expected "
+            f"{source['tree_sha256']}, got {source_digest}"
+        )
+    destination = root / dependency["output"]["path"]
+    temporary = _atomic_output_path(destination)
+    temporary.unlink()
+    artifacts = root / ".artifacts"
+    artifacts.mkdir(parents=True, exist_ok=True)
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "CGO_ENABLED": "0",
+            "GOOS": "linux",
+            "GOARCH": "amd64",
+            "GOCACHE": str(artifacts / "go-cache"),
+            "GOTOOLCHAIN": "local",
+        }
+    )
+    command = [
+        "go",
+        "build",
+        "-trimpath",
+        "-ldflags=-s -w",
+        "-o",
+        str(temporary),
+        ".",
+    ]
+    try:
+        completed = subprocess.run(
+            command,
+            cwd=source_dir,
+            env=environment,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        if completed.returncode != 0:
+            detail = completed.stdout.strip() or f"exit {completed.returncode}"
+            raise PrepareError(f"{dependency['id']} build failed: {detail}")
+        os.chmod(temporary, _mode(dependency["output"]["mode"]))
+        output_digest = sha256_file(temporary)
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return {
+        "source_tree_sha256": source_digest,
+        "output_sha256": output_digest,
+    }
+
+
+def prepare_source_build(
+    root: Path, dependency: Dict[str, Any], offline: bool
+) -> Dict[str, str]:
+    source = dependency["source"]
+    source_dir = root / source["path"]
+    source_digest = source_tree_sha256(source_dir)
+    if source_digest != source["tree_sha256"]:
+        raise PrepareError(
+            f"{dependency['id']} source SHA-256 mismatch: expected "
+            f"{source['tree_sha256']}, got {source_digest}"
+        )
+    command_key = "offline_command" if offline else "command"
+    command = dependency["build"].get(command_key)
+    if not isinstance(command, list) or not command:
+        raise PrepareError(f"{dependency['id']} has no {command_key}")
+    completed = subprocess.run(
+        command,
+        cwd=source_dir,
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    if completed.returncode != 0:
+        detail = completed.stdout.strip() or f"exit {completed.returncode}"
+        raise PrepareError(f"{dependency['id']} build failed: {detail}")
+    destination = root / dependency["output"]["path"]
+    if not destination.is_file():
+        raise PrepareError(
+            f"{dependency['id']} build did not create expected output: {destination}"
+        )
+    os.chmod(destination, _mode(dependency["output"]["mode"]))
+    return {
+        "source_tree_sha256": source_digest,
+        "output_sha256": sha256_file(destination),
+    }
+
+
+def _go_version() -> tuple:
+    if shutil.which("go") is None:
+        raise PrepareError("required command is missing: go")
+    completed = subprocess.run(
+        ["go", "env", "GOVERSION"],
+        check=False,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    match = re.fullmatch(r"go(\d+)\.(\d+)(?:\.(\d+))?", completed.stdout.strip())
+    if completed.returncode != 0 or match is None:
+        raise PrepareError(f"could not determine Go version: {completed.stdout.strip()}")
+    return int(match.group(1)), int(match.group(2)), int(match.group(3) or 0)
+
+
+def _required_go_version(root: Path, dependencies: Iterable[Dict[str, Any]]) -> tuple:
+    required = (0, 0, 0)
+    for dependency in dependencies:
+        if dependency["kind"] != "go-build":
+            continue
+        go_mod = root / dependency["source"]["path"] / "go.mod"
+        try:
+            content = go_mod.read_text(encoding="utf-8")
+        except FileNotFoundError as error:
+            raise PrepareError(f"Go module file is missing: {go_mod}") from error
+        match = re.search(r"(?m)^go (\d+)\.(\d+)(?:\.(\d+))?\s*$", content)
+        if match is None:
+            raise PrepareError(f"Go version is missing from {go_mod}")
+        required = max(required, (int(match.group(1)), int(match.group(2)), int(match.group(3) or 0)))
+    return required
+
+
+def validate_prerequisites(root: Path, dependencies: List[Dict[str, Any]]) -> None:
+    required = _required_go_version(root, dependencies)
+    if required != (0, 0, 0):
+        actual = _go_version()
+        if actual < required:
+            raise PrepareError(
+                f"Go {'.'.join(map(str, required))} or newer is required; found "
+                f"{'.'.join(map(str, actual))}"
+            )
+    for dependency in dependencies:
+        for command in dependency.get("build", {}).get("prerequisites", []):
+            if shutil.which(command) is None:
+                raise PrepareError(f"required command is missing: {command}")
+
+
+def _write_state(root: Path, records: Dict[str, Dict[str, str]]) -> None:
+    state_path = root / ".artifacts" / "prepare-state.json"
+    temporary = _atomic_output_path(state_path)
+    try:
+        payload = {
+            "schema_version": 1,
+            "target": "linux/amd64",
+            "dependencies": records,
+        }
+        temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        os.chmod(temporary, 0o600)
+        os.replace(temporary, state_path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
+def prepare_all(
+    root: Path, dependencies: List[Dict[str, Any]], offline_dir: Optional[Path]
+) -> Dict[str, Dict[str, str]]:
+    validate_prerequisites(root, dependencies)
+    if offline_dir is not None and not offline_dir.is_dir():
+        raise PrepareError(f"offline directory is missing: {offline_dir}")
+    records: Dict[str, Dict[str, str]] = {}
+    for dependency in dependencies:
+        kind = dependency["kind"]
+        if kind == "release-archive":
+            record = prepare_release(root, dependency, offline_dir)
+        elif kind == "go-build":
+            record = prepare_go_build(root, dependency)
+        elif kind == "source-build":
+            record = prepare_source_build(root, dependency, offline_dir is not None)
+        else:
+            raise PrepareError(f"unsupported dependency kind: {kind}")
+        records[dependency["id"]] = record
+    _write_state(root, records)
+    return records
+
+
+def check_all(root: Path, dependencies: List[Dict[str, Any]]) -> None:
+    validate_prerequisites(root, dependencies)
+    state_path = root / ".artifacts" / "prepare-state.json"
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except FileNotFoundError as error:
+        raise PrepareError(f"preparation state is missing: {state_path}") from error
+    except json.JSONDecodeError as error:
+        raise PrepareError(f"preparation state is invalid: {state_path}: {error}") from error
+    if state.get("target") != "linux/amd64":
+        raise PrepareError("preparation state has the wrong target")
+    records = state.get("dependencies", {})
+    for dependency in dependencies:
+        name = dependency["id"]
+        record = records.get(name)
+        if not isinstance(record, dict):
+            raise PrepareError(f"preparation state is missing dependency: {name}")
+        destination = root / dependency["output"]["path"]
+        if not destination.is_file():
+            raise PrepareError(f"prepared output is missing: {destination}")
+        actual_output = sha256_file(destination)
+        expected_output = dependency["output"].get("sha256") or record.get(
+            "output_sha256"
+        )
+        if not expected_output or actual_output != expected_output:
+            raise PrepareError(
+                f"prepared output SHA-256 mismatch for {name}: expected "
+                f"{expected_output}, got {actual_output}"
+            )
+        if stat.S_IMODE(destination.stat().st_mode) != _mode(
+            dependency["output"]["mode"]
+        ):
+            raise PrepareError(f"prepared output has the wrong mode: {destination}")
+        if dependency["kind"] in {"go-build", "source-build"}:
+            source_digest = source_tree_sha256(root / dependency["source"]["path"])
+            if source_digest != dependency["source"]["tree_sha256"]:
+                raise PrepareError(f"source SHA-256 mismatch for {name}")
+            if record.get("source_tree_sha256") != source_digest:
+                raise PrepareError(f"prepared output is stale for source: {name}")
+
+
+def _load_dependencies(root: Path) -> List[Dict[str, Any]]:
+    path = root / "provenance" / "dependencies.json"
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise PrepareError(f"could not read {path}: {error}") from error
+    dependencies = document.get("dependencies")
+    if document.get("schema_version") != 1 or not isinstance(dependencies, list):
+        raise PrepareError(f"unsupported dependency manifest: {path}")
+    return dependencies
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Prepare digest-checked Linux runtime artifacts."
+    )
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--offline",
+        type=Path,
+        metavar="DIR",
+        help="read pinned release archives from DIR instead of downloading",
+    )
+    group.add_argument(
+        "--check",
+        action="store_true",
+        help="validate prerequisites and prepared outputs without downloads",
+    )
+    args = parser.parse_args(argv)
+    root = Path(__file__).resolve().parent.parent
+    try:
+        dependencies = _load_dependencies(root)
+        if args.check:
+            check_all(root, dependencies)
+            print(f"PASS: {len(dependencies)} prepared dependencies verified")
+        else:
+            records = prepare_all(root, dependencies, args.offline)
+            for name, record in records.items():
+                print(f"PREPARED {name} sha256={record['output_sha256']}")
+    except PrepareError as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""Verify the standalone native kit locally; never connects to CF or Hub."""
+import argparse
+import os
+from pathlib import Path
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from verification.audit import audit
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--static', action='store_true', help='source, docs and topology checks only')
+    parser.add_argument('--offline', action='store_true', help='use populated dependency caches')
+    args = parser.parse_args()
+    env = dict(os.environ, GOTOOLCHAIN='local', GOCACHE=str(ROOT / '.artifacts/go-cache'))
+    env.setdefault('GRADLE_USER_HOME', str(ROOT / '.artifacts/gradle-home'))
+    if args.offline:
+        env.update(GOPROXY='off', GOSUMDB='off')
+
+    def run(command, cwd=ROOT):
+        subprocess.run(command, cwd=cwd, env=env, check=True)
+
+    try:
+        audit(ROOT)
+        if args.static:
+            return 0
+        run([sys.executable, 'bin/prepare', '--check'])
+        run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-v'])
+        for module in ('apps/demo-guide', 'runtime/hub-mcp-relay'):
+            run(['go', 'test', '-count=1', './...'], ROOT / module)
+        run(['./gradlew', '--no-daemon'] + (['--offline'] if args.offline else []) + ['test', 'bootJar'], ROOT / 'apps/market')
+        reports = list((ROOT / 'apps/market/build/test-results/test').glob('TEST-*.xml'))
+        total = sum(int(ET.parse(path).getroot().get('tests', '0')) for path in reports)
+        if not total:
+            raise ValueError('Market produced no test results')
+        run([sys.executable, 'bin/prepare', '--check'])
+        print(f'PASS: native kit regression suite including {total} Market tests. Authenticated live acceptance remains separate.')
+        return 0
+    except (OSError, ValueError, subprocess.CalledProcessError) as error:
+        print('FAIL: ' + str(error), file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

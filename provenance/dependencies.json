@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "target": "linux/amd64",
+  "dependencies": [
+    {
+      "id": "oauth2-proxy",
+      "kind": "release-archive",
+      "version": "v7.15.6",
+      "source": {
+        "url": "https://github.com/oauth2-proxy/oauth2-proxy/releases/download/v7.15.6/oauth2-proxy-v7.15.6.linux-amd64.tar.gz",
+        "archive_filename": "oauth2-proxy-v7.15.6.linux-amd64.tar.gz",
+        "archive_sha256": "91b3e86d9c2de679a516e6696704e3fd1acf67e8b8f7be77b618f086f72fb1f0",
+        "license": "MIT",
+        "license_url": "https://github.com/oauth2-proxy/oauth2-proxy/blob/v7.15.6/LICENSE",
+        "license_file": "third_party/licenses/oauth2-proxy-MIT.txt"
+      },
+      "archive_member": "oauth2-proxy-v7.15.6.linux-amd64/oauth2-proxy",
+      "output": {
+        "path": "apps/agent/bin/oauth2-proxy",
+        "sha256": "cbaad42f283a1f729ced94b39f7c453039c3aa8d20c9a44c6ff67a4f02072fb2",
+        "mode": "0755"
+      }
+    },
+    {
+      "id": "northstar-market",
+      "kind": "source-build",
+      "version": "native-public-example-2026-11-11",
+      "source": {
+        "path": "apps/market",
+        "tree_sha256": "751936a48f3fefcab5c6c0394ee00563ae219919a87a63f354b16df619a30092",
+        "license": "Apache-2.0",
+        "notice_file": "apps/market/ASSET-PROVENANCE.md",
+        "license_file": "LICENSE"
+      },
+      "build": {
+        "prerequisites": [
+          "java"
+        ],
+        "command": [
+          "./gradlew",
+          "bootJar"
+        ],
+        "offline_command": [
+          "./gradlew",
+          "--offline",
+          "bootJar"
+        ]
+      },
+      "output": {
+        "path": "apps/market/build/libs/northstar-market.jar",
+        "mode": "0644"
+      }
+    },
+    {
+      "id": "demo-guide",
+      "kind": "go-build",
+      "version": "native-public-example-2026-11-11",
+      "source": {
+        "path": "apps/demo-guide",
+        "tree_sha256": "3d54b6cd536c841c1646c2411adfe3abf947613ae4a3c9822ae430451a8bf4f2",
+        "license": "Apache-2.0",
+        "license_file": "LICENSE"
+      },
+      "output": {
+        "path": ".artifacts/demo-guide-server",
+        "mode": "0755"
+      }
+    },
+    {
+      "id": "hub-mcp-relay",
+      "kind": "go-build",
+      "version": "native-public-example-2026-11-11",
+      "source": {
+        "path": "runtime/hub-mcp-relay",
+        "tree_sha256": "cd33c7ab51e87fffb7b47e3efae870a02ec4a9d878ad234ba15b2908d76cd7c3",
+        "license": "Apache-2.0",
+        "license_file": "LICENSE"
+      },
+      "output": {
+        "path": ".artifacts/hub-mcp-relay",
+        "mode": "0755"
+      }
+    }
+  ]
+}

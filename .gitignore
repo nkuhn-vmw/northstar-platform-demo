@@ -1,0 +1,13 @@
+.artifacts/
+.credentials/
+.state/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+*.local.json
+.env
+.env.*
+apps/agent/bin/
+apps/market/.gradle/
+apps/market/build/

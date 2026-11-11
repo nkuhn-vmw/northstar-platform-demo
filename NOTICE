@@ -1,0 +1,23 @@
+Northstar Platform Demo
+Copyright 2026 Northstar contributors
+
+This project contains owner-authorized Northstar application, presentation and
+lifecycle source, released under the Apache License, Version 2.0. See LICENSE and
+provenance/SOURCES.md for origin and modifications.
+
+Third-party components retain their own licenses:
+
+- oauth2-proxy: MIT; Copyright (c) OAuth2 Proxy Contributors.
+  The exact upstream license is in third_party/licenses/oauth2-proxy-MIT.txt.
+  The prepared executable comes from the official release pinned in the ledger.
+- Go standard library/runtime: BSD-style license; The Go Authors.
+  See third_party/licenses/Go-BSD.txt. The guide and relay embed this runtime.
+- Gradle wrapper: Apache-2.0; Gradle Inc. Original wrapper script notices are
+  preserved. The distribution is downloaded with an explicit checksum.
+- Market's Java dependencies are resolved from public Maven artifacts using the
+  Spring Boot dependency management platform. Their embedded upstream license
+  and notice files remain in the built JAR. This project's license does not
+  replace those licenses.
+
+Tanzu and other vendor names identify required platform integrations. No vendor
+endorsement or platform-product redistribution right is implied.

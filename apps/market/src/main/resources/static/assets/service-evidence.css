@@ -1,0 +1,65 @@
+.service-roadmap span[data-status="active"] {
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 0 0 3px rgba(31, 106, 74, .12);
+}
+
+.service-roadmap span[data-status="bound"] {
+  outline: 1px solid var(--green);
+}
+
+.service-evidence {
+  padding: 12px 21px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.service-evidence-row {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 0;
+  border-bottom: 1px solid #edf1ed;
+}
+
+.service-evidence-row:last-child {
+  border: 0;
+}
+
+.service-evidence-row > i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #aab5b2;
+}
+
+.service-evidence-row[data-status="active"] > i {
+  background: #37a369;
+  box-shadow: 0 0 8px rgba(55, 163, 105, .55);
+}
+
+.service-evidence-row[data-status="bound"] > i {
+  background: var(--gold);
+}
+
+.service-evidence-row span b,
+.service-evidence-row span small {
+  display: block;
+}
+
+.service-evidence-row span b {
+  font-size: 9px;
+}
+
+.service-evidence-row span small {
+  color: #7a8987;
+  font-size: 7px;
+}
+
+.service-evidence-row em {
+  color: #55706b;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+}

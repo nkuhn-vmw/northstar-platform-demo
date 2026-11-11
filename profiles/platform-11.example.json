@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "target": {
+    "api": "https://api.example.com",
+    "org": "replace-org",
+    "space": "replace-space",
+    "prefix": "replace-prefix"
+  },
+  "routes": {
+    "domain": "apps.example.com",
+    "internal_domain": "apps.internal"
+  },
+  "buildpacks": {
+    "agent": "agent_buildpack",
+    "java": "java_buildpack_offline",
+    "binary": "binary_buildpack"
+  },
+  "services": {
+    "model": {
+      "offering": "ai-models",
+      "plan": "replace-model-plan"
+    },
+    "sso": {
+      "offering": "p-identity",
+      "plan": "replace-sso-plan"
+    },
+    "gateway": {
+      "offering": "mcp-gateway",
+      "plan": "gateway"
+    },
+    "memory": {
+      "offering": "agent-memory",
+      "plan": "memory"
+    },
+    "credential_store": {
+      "offering": "credential-store",
+      "plan": "shared"
+    }
+  },
+  "models": {
+    "interactive": "replace-model"
+  },
+  "sso": {
+    "allowed_emails": [
+      "presenter@example.com"
+    ],
+    "identity_provider": "replace-provider",
+    "scopes": "openid,roles",
+    "agent_scopes": "openid",
+    "allow_unverified_email": false
+  },
+  "integrations": {
+    "hub": false
+  },
+  "hub": {
+    "mcp_url": "https://hub.example.com/mcp",
+    "resource_metadata_url": "https://hub.example.com/.well-known/oauth-protected-resource",
+    "authorization_server": "https://login.example.com",
+    "auth_mode": "gateway-oauth"
+  },
+  "credentials": {
+    "hub_oauth": ".credentials/hub-oauth.json"
+  },
+  "customer": {
+    "display_name": "North Star Market",
+    "description": "Synthetic grocery assistant \u00b7 Tanzu Platform 11",
+    "welcome_suggestions": [
+      "Show me the available produce",
+      "Recall my saved pickup preference",
+      "Explain how my connections use Credential Store",
+      "Explain your current capabilities"
+    ]
+  },
+  "timeout_seconds": 600,
+  "agent_package": "platform-11",
+  "credential_store_ui_base": "",
+  "guide": {
+    "documentation_url": "https://github.com/nkuhn-vmw/northstar-platform-demo/blob/main/docs/deploy.md"
+  }
+}

@@ -1,0 +1,88 @@
+[
+  {
+    "id": "model",
+    "kind": "service",
+    "phase": 1,
+    "depends_on": [],
+    "service": "model"
+  },
+  {
+    "id": "sso",
+    "kind": "service",
+    "phase": 1,
+    "depends_on": [],
+    "service": "sso"
+  },
+  {
+    "id": "agent",
+    "kind": "app",
+    "phase": 1,
+    "depends_on": [
+      "model",
+      "sso"
+    ],
+    "app": "agent"
+  },
+  {
+    "id": "gateway",
+    "kind": "service",
+    "phase": 2,
+    "depends_on": [],
+    "service": "gateway"
+  },
+  {
+    "id": "market",
+    "kind": "app",
+    "phase": 2,
+    "depends_on": [
+      "gateway"
+    ],
+    "app": "market"
+  },
+  {
+    "id": "market-descriptor",
+    "kind": "descriptor",
+    "phase": 2,
+    "depends_on": [
+      "market",
+      "gateway"
+    ],
+    "backend": "market"
+  },
+  {
+    "id": "hub-descriptor",
+    "kind": "descriptor",
+    "phase": 2,
+    "depends_on": [
+      "gateway"
+    ],
+    "integration": "hub",
+    "backend": "hub"
+  },
+  {
+    "id": "memory",
+    "kind": "service",
+    "phase": 3,
+    "depends_on": [],
+    "service": "memory"
+  },
+  {
+    "id": "customer",
+    "kind": "configuration",
+    "phase": 4,
+    "depends_on": [
+      "agent",
+      "market"
+    ]
+  },
+  {
+    "id": "guide",
+    "kind": "app",
+    "phase": 4,
+    "depends_on": [
+      "sso",
+      "agent"
+    ],
+    "app": "guide"
+  }
+]

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f4ed">
+  <title>Northstar Market — Fresh food, thoughtfully delivered</title>
+  <link rel="stylesheet" href="/assets/store.css">
+  <link rel="stylesheet" href="/assets/service-evidence.css">
+  <script src="/assets/store.js" defer></script>
+</head>
+<body>
+  <div class="announcement"><strong>FreshPass members</strong><span>Free same-day delivery on orders over $50</span><a href="#membership">Explore benefits →</a></div>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Northstar Market home">
+      <i aria-hidden="true">✦</i><span><strong>NORTHSTAR</strong><small>MARKET</small></span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="#shop">Shop</a><a href="#meals">Meals</a><a href="#fresh">Fresh & local</a><a href="#membership">FreshPass</a>
+    </nav>
+    <div class="header-actions">
+      <button class="location-button"><span>Pickup at</span><b>Northstar Riverfront</b></button>
+      <button class="icon-button" id="search-toggle" aria-label="Focus search">⌕</button>
+      <button class="cart-button" id="cart-toggle"><span>Basket</span><b id="cart-count">0</b></button>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <img class="hero-image" src="/assets/products/northstar-hero.png" alt="Fresh Northstar Market groceries">
+      <div class="hero-shade"></div>
+      <div class="hero-copy">
+        <span class="eyebrow light">FRESH FROM YOUR NEIGHBORHOOD</span>
+        <h1>Good food.<br><em>Ready when you are.</em></h1>
+        <p>Market-quality groceries, chef-made meals, and thoughtful substitutions—picked with care and ready for pickup or delivery.</p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#shop">Start your basket <b>→</b></a>
+          <a class="glass-button" href="#meals">Plan this week's meals</a>
+        </div>
+        <div class="delivery-slots">
+          <span><i></i><b>Delivery today</b><small>as soon as 4:30 PM</small></span>
+          <span><i></i><b>Curbside pickup</b><small>ready in 90 minutes</small></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="promise-strip" aria-label="Northstar service promises">
+      <article><i>◌</i><div><strong>Freshness, guaranteed</strong><span>Refunded if it misses the mark</span></div></article>
+      <article><i>⌖</i><div><strong>Picked in your store</strong><span>Live local inventory</span></div></article>
+      <article><i>↻</i><div><strong>Smart substitutions</strong><span>You stay in control</span></div></article>
+      <article><i>♡</i><div><strong>Member rewards</strong><span>Personal offers that add up</span></div></article>
+    </section>
+
+    <section class="shop-section" id="shop">
+      <div class="section-heading">
+        <div><span class="eyebrow">SHOP THE MARKET</span><h2>Everything for a great week.</h2></div>
+        <p>Live inventory, clear sourcing, and fulfillment options from your neighborhood Northstar.</p>
+      </div>
+      <div class="catalog-toolbar">
+        <div class="category-tabs" id="category-tabs">
+          <button class="active" data-category="all">Featured</button>
+          <button data-category="produce">Produce</button>
+          <button data-category="prepared">Prepared meals</button>
+          <button data-category="bakery">Bakery</button>
+          <button data-category="pantry">Pantry</button>
+          <button data-category="dairy">Dairy</button>
+          <button data-category="meat">Meat & seafood</button>
+          <button data-category="household">Home</button>
+        </div>
+        <label class="search-box"><span>⌕</span><input id="catalog-search" type="search" placeholder="Search the market" autocomplete="off"></label>
+      </div>
+      <div class="results-meta"><span id="result-count">Curating today's market…</span><button>Sort: Recommended⌄</button></div>
+      <div class="product-grid" id="product-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="fresh-story" id="fresh">
+      <img src="/assets/products/fresh-produce.png" alt="Fresh regional produce">
+      <div>
+        <span class="eyebrow light">NORTHSTAR FRESH</span>
+        <h2>From nearby farms to your table.</h2>
+        <p>Our produce teams combine supplier traceability with local inventory so every order is picked for quality, ripeness, and the way you plan to use it.</p>
+        <ul><li><b>84%</b> of seasonal produce sourced within 250 miles</li><li><b>24-hour</b> freshness window on local greenhouse greens</li><li><b>Your call</b> on every substitution</li></ul>
+        <a href="#shop">Shop fresh & local →</a>
+      </div>
+    </section>
+
+    <section class="meal-planner" id="meals">
+      <div class="planner-copy">
+        <span class="eyebrow">NORTHSTAR MEAL CONCIERGE</span>
+        <h2>A smarter start to dinner.</h2>
+        <p>Today, rules and live inventory recommend a useful basket. Next, a governed AI service and MCP Gateway can ground the experience in catalog, loyalty, nutrition, and fulfillment tools.</p>
+        <div class="agent-evidence"><i></i><span>Grounded in current catalog and store availability</span></div>
+      </div>
+      <form class="planner-card" id="advisor-form">
+        <div class="planner-top"><span>Plan my shop</span><small>RIVERFRONT STORE · LIVE</small></div>
+        <label>What are you planning?
+          <select id="advisor-workload">
+            <option value="weeknight">Easy weeknight meals</option>
+            <option value="family">A full family shop</option>
+            <option value="fresh">Fresh & seasonal</option>
+            <option value="prepared">Prepared and ready to eat</option>
+          </select>
+        </label>
+        <label>Basket budget<div class="budget-input"><span>$</span><input id="advisor-budget" type="number" value="75" min="20" max="250"></div></label>
+        <label>What matters most?<div class="priority-group"><button type="button" class="active" data-priority="balanced">Balanced</button><button type="button" data-priority="speed">Fast</button><button type="button" data-priority="value">Value</button></div></label>
+        <button class="primary-button full" type="submit">Build a smart basket <b>→</b></button>
+        <div class="advisor-result" id="advisor-result" hidden></div>
+      </form>
+    </section>
+
+    <section class="fulfillment-story">
+      <img src="/assets/products/fulfillment.png" alt="Northstar curbside grocery fulfillment">
+      <div>
+        <span class="eyebrow light">ONE MARKET. EVERY CHANNEL.</span>
+        <h2>Picked with care.<br>Delivered your way.</h2>
+        <p>The same order can move through curbside, same-day delivery, or scheduled pickup while inventory and customer preferences stay consistent.</p>
+        <div class="fulfillment-options"><span><b>90 min</b> curbside</span><span><b>Same day</b> delivery</span><span><b>7 days</b> scheduled</span></div>
+      </div>
+    </section>
+
+    <section class="membership" id="membership">
+      <div><span class="eyebrow">FRESHPASS</span><h2>One relationship across every shop.</h2><p>Shared identity, loyalty, offers, and preferences create a continuous experience from the storefront to fulfillment.</p><button class="secondary-button">See member benefits</button></div>
+      <div class="member-card"><div><i>✦</i><span><small>FRESHPASS</small><strong>Northstar Member</strong></span></div><b>8,420</b><small>POINTS AVAILABLE</small><hr><p><span>Next reward</span><strong>$15 market credit</strong></p></div>
+    </section>
+
+    <section class="platform-story" id="platform">
+      <div class="platform-copy">
+        <span class="eyebrow">BUILT TO BECOME A SUITE</span>
+        <h2>One Spring application.<br>Clear enterprise boundaries.</h2>
+        <p>Northstar begins as a modular application with catalog, pricing, inventory, basket, ordering, fulfillment, and loyalty boundaries. Tanzu Platform gives each capability a secure path to services as the suite grows.</p>
+        <div class="capability-map">
+          <span>Storefront</span><i>→</i><span>Catalog</span><i>→</i><span>Inventory</span><i>→</i><span>Basket</span><i>→</i><span>Orders</span><i>→</i><span>Fulfillment</span>
+        </div>
+        <div class="service-roadmap" aria-label="Northstar managed service roadmap">
+          <span data-capability="postgresql">Postgres</span><span data-capability="valkey">Valkey</span><span data-capability="rabbitmq">RabbitMQ</span><span>SSO</span><span>App Autoscaler</span><span data-capability="ai-models">AI Models</span><span>MCP Gateway</span>
+        </div>
+      </div>
+      <div class="platform-status">
+        <div class="status-top"><span><i></i> Tanzu Platform evidence</span><small>LIVE RUNTIME</small></div>
+        <div class="status-hero"><span>APPLICATION</span><strong id="platform-app">northstar-market</strong><small id="platform-instance">Loading platform evidence…</small></div>
+        <div class="platform-grid">
+          <div><span>RUNTIME</span><b id="platform-runtime">Spring Boot</b></div>
+          <div><span>ROUTE</span><b id="platform-route">localhost</b></div>
+          <div><span>DATA</span><b id="platform-database">Embedded H2</b></div>
+          <div><span>SECURITY</span><b>Spring Security · CSP · HSTS</b></div>
+        </div>
+        <div class="service-evidence" id="platform-services" aria-label="Service capability evidence"></div>
+        <div class="golden-path"><small>GOVERNED DELIVERY</small><p><span>Source</span><i>→</i><span>Buildpack</span><i>→</i><span>Runtime</span><i>→</i><span>Hub</span></p></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="cart-drawer" id="cart-drawer" aria-hidden="true">
+    <div class="drawer-head"><div><small>NORTHSTAR RIVERFRONT</small><h3>Your basket</h3></div><button id="cart-close" aria-label="Close basket">×</button></div>
+    <div class="cart-lines" id="cart-lines"></div>
+    <div class="cart-summary"><div><span>Estimated subtotal</span><strong id="cart-total">$0.00</strong></div><p><span>Pickup</span><b>Today · 4:30–5:00 PM</b></p><small>Taxes, deposits, and final weighted-item prices shown at checkout.</small><button class="primary-button full" id="checkout-button">Review order <b>→</b></button></div>
+  </aside>
+  <div class="drawer-scrim" id="drawer-scrim"></div>
+  <div class="toast" id="toast"></div>
+
+  <footer><a class="brand" href="#top"><i>✦</i><span><strong>NORTHSTAR</strong><small>MARKET</small></span></a><p>Fresh food, thoughtful service, one trusted market.</p><div><a href="#platform">Platform evidence</a><a href="/actuator/health">Health</a></div></footer>
+</body>
+</html>

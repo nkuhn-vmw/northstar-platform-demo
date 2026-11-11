@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 48" role="img" aria-labelledby="title desc">
+  <title id="title">Northstar Market</title>
+  <desc id="desc">Northstar Market evergreen star mark and wordmark.</desc>
+  <g transform="translate(3 3)">
+    <circle cx="21" cy="21" r="21" fill="#1f6a4a"/>
+    <path d="m21 9 2.4 7.1L30.5 21l-7.1 2.4L21 30.5l-2.4-7.1-7.1-2.4 7.1-2.4Z" fill="#fffdf8"/>
+  </g>
+  <g fill="#152b2d">
+    <text x="55" y="22" font-family="Georgia, 'Times New Roman', serif" font-size="17" font-weight="700" letter-spacing="1.1">NORTHSTAR</text>
+    <text x="57" y="38" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="10" font-weight="750" letter-spacing="4.2" fill="#1f6a4a">MARKET</text>
+  </g>
+</svg>

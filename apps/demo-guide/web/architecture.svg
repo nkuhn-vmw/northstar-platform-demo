@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="820" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+<title id="title">Northstar native Platform 11 architecture</title>
+<desc id="desc">Platform SSO protects Copilot and the presenter guide. Copilot binds the model, native Agent Memory and Credential Store. MCP Gateway routes catalog requests to Market and optional user OAuth requests through an internal relay to Tanzu Hub. Each deployment owns its own service instances.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#46675e" stroke-width="1.4"/></marker></defs>
+<rect width="1200" height="820" fill="#f5f5ed"/>
+<g font-family="system-ui,sans-serif" fill="#173e35">
+<text x="48" y="57" font-size="28" font-weight="700">Northstar · native platform services</text>
+<text x="48" y="88" font-size="16">One installation in your org and space. Synthetic catalog data. Your own identities and service plans.</text>
+<rect x="32" y="112" width="1136" height="574" rx="18" fill="#fff" stroke="#c7d7d0" stroke-width="2"/>
+<text x="52" y="143" font-size="13" font-weight="600">DEDICATED APPLICATION SPACE</text>
+<g fill="#eff4ef" stroke="#a9c6b9" stroke-width="2">
+<rect x="65" y="184" width="220" height="90" rx="10"/>
+<rect x="345" y="184" width="230" height="90" rx="10"/>
+<rect x="665" y="184" width="225" height="90" rx="10"/>
+<rect x="65" y="348" width="220" height="90" rx="10"/>
+<rect x="345" y="348" width="230" height="90" rx="10"/>
+<rect x="665" y="348" width="225" height="90" rx="10"/>
+<rect x="65" y="525" width="220" height="106" rx="10"/>
+<rect x="345" y="525" width="230" height="106" rx="10"/>
+<rect x="665" y="525" width="225" height="106" rx="10"/>
+</g>
+<g text-anchor="middle">
+<text x="175" y="220" font-size="19" font-weight="700">Platform SSO</text><text x="175" y="246" font-size="14">Allowed presenter identity</text>
+<text x="460" y="220" font-size="19" font-weight="700">Northstar Copilot</text><text x="460" y="246" font-size="14">Native Agent Buildpack</text>
+<text x="777" y="220" font-size="19" font-weight="700">Model service</text><text x="777" y="246" font-size="14">Your configured model</text>
+<text x="175" y="384" font-size="19" font-weight="700">Presenter guide</text><text x="175" y="410" font-size="14">SSO · prompts and launch links</text>
+<text x="460" y="384" font-size="19" font-weight="700">MCP Gateway</text><text x="460" y="410" font-size="14">Separate paths per tool</text>
+<text x="777" y="384" font-size="19" font-weight="700">Northstar Market</text><text x="777" y="410" font-size="14">Synthetic catalog MCP + UI</text>
+<text x="175" y="560" font-size="19" font-weight="700">Agent Memory</text><text x="175" y="588" font-size="14">Native binding · user identity</text><text x="175" y="609" font-size="13">Recall across conversations</text>
+<text x="460" y="560" font-size="19" font-weight="700">Credential Store</text><text x="460" y="588" font-size="14">Native binding · user grants</text><text x="460" y="609" font-size="13">No credentials in prompts</text>
+<text x="777" y="560" font-size="19" font-weight="700">Hub relay · optional</text><text x="777" y="588" font-size="14">Internal route only</text><text x="777" y="609" font-size="13">Gateway OAuth app binding</text>
+</g>
+<g fill="none" stroke="#46675e" stroke-width="2" marker-end="url(#arrow)">
+<path d="M285 229H345"/><path d="M575 229H665"/><path d="M175 274V348"/>
+<path d="M460 274V348"/><path d="M575 393H665"/>
+<path d="M345 252H318V505H175V525"/><path d="M555 274H610V495H460V525"/>
+<path d="M575 418H630V577H665"/><path d="M890 577H950V741H895"/>
+</g>
+<text x="474" y="314" font-size="13">Tool calls</text>
+<text x="594" y="376" font-size="12">Catalog</text>
+<text x="954" y="568" font-size="13">User OAuth</text>
+<rect x="665" y="704" width="230" height="80" rx="10" fill="#173e35"/>
+<text x="780" y="738" fill="#fff" text-anchor="middle" font-size="19" font-weight="700">Your Tanzu Hub</text>
+<text x="780" y="763" fill="#fff" text-anchor="middle" font-size="14">Inventory within your permissions</text>
+<text x="48" y="735" font-size="15">Model, memory and credentials use separate agent bindings.</text>
+<text x="48" y="764" font-size="15">Hub requires client registration and each presenter's consent.</text>
+<text x="48" y="793" font-size="13">Reference architecture, not a live status display. Platform infrastructure is operator managed.</text>
+</g></svg>

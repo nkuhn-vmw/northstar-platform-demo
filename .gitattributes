@@ -1,0 +1,2 @@
+# Preserve official Windows wrapper bytes and recognize its CRLF endings.
+*.bat -text whitespace=cr-at-eol

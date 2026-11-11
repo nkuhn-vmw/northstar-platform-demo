@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: gradle
+    directory: /apps/market
+    schedule:
+      interval: weekly
+  - package-ecosystem: gomod
+    directories:
+      - /apps/demo-guide
+      - /runtime/hub-mcp-relay
+    schedule:
+      interval: weekly
