@@ -61,7 +61,11 @@ to remove its OAuth client; CF cleanup does not deregister that Hub client. Defa
 Open this installation's Credential Store in Tanzu Hub. Add the Hub descriptor,
 keep **Scope credential to current user** checked, allow the authentication popup,
 complete the gateway and Hub OAuth flow, then save. Use the descriptor for this installation's `/<prefix>-hub-relay/mcp` resource; a grant for another resource or installation is not interchangeable.
-Reconnect in Copilot and request the applications in your own org and space,
+In Copilot, open MCP settings, choose **Connect** for the Hub descriptor, then
+**Reconnect** after saving the credential. Re-discovering servers does not perform
+this credential reconnect. If it reports an expired sign-in, sign out and back in
+through the agent's SSO controls, then reconnect.
+Request the applications in your own org and space,
 explicitly using read-only operations. Inspect the actual tool result. A healthy
 app, successful consent or discovered tool list alone is not inventory acceptance.
 

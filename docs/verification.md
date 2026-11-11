@@ -1,6 +1,6 @@
 # Verification record
 
-Checked on 11 November 2026. This is a source release candidate. Core authenticated flows passed on an independent foundation; optional Hub inventory acceptance remains pending its foundation callback configuration and personal consent. Results do not certify a model, native memory or Hub grant in your environment.
+Checked on 11 November 2026. This is a source release candidate. Authenticated core flows and optional user-scoped Hub inventory passed on an independent foundation. Each installation still needs its own configuration, credentials and acceptance checks.
 
 ## Local checks completed
 
@@ -29,9 +29,14 @@ below for this rehearsal only. The original deployment was not changed.
   presenter from the guide's allowlist produced HTTP 403. The original allowlist
   was restored exactly and allowed admission was verified again.
 - The optional Hub client, internal relay, gateway OAuth binding and descriptor
-  deployed. The personal consent flow exposed a missing exact foundation SSO
-  callback; no read-only Hub inventory success is claimed yet. Follow the
-  [environment-specific prerequisites](hub-oauth.md).
+  deployed. After an operator approved the missing exact foundation SSO callback,
+  the presenter completed both consent steps and saved an OAuth credential with
+  User scope. The agent called `get_organizations`, `get_spaces` and
+  `get_applications` through Hub, filtering applications by the new space's GUID.
+  The raw result contained exactly the four expected apps: agent, Market, guide
+  and relay. Their reported STARTED/RUNNING states matched a separate Cloud
+  Foundry status check. No Hub write tool was invoked. The
+  [Hub walkthrough](hub-oauth.md) includes callback and session-reconnect steps.
 - Cleanup was previewed only; no service data was deleted.
 
 Observed platform components: Agent Buildpack 0.2.39, Java Buildpack 5.0.0,
