@@ -10,7 +10,7 @@ Checked on 11 November 2026. This is a source release candidate; authenticated a
 - Interactively checked the loopback presenter guide, native architecture diagram and endpoint filtering. The rebuilt Market served its synthetic catalog and Produce filter returned three products. These were unauthenticated local previews.
 - Gitleaks 8.30.1 reported no findings in the selected source export or initial clean Git history. Old repository history, local profiles, state, credentials, logs and build caches are excluded from this new repository.
 
-Independent review found no code-level release blocker. Its deployment-risk and cleanup documentation findings were corrected; artifact integrity, stack compatibility and runtime-only SSO configuration also received focused fixes and regression checks. A bounded follow-up found no actionable defects in the integrity and stack gates. The initial clean-history commit passed [fresh-clone CI](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/runs/43069816932); use the [latest workflow run](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/workflows/verify.yml) for the current source revision. Every deployment must complete the signed-in checks in [the deployment guide](deploy.md).
+Independent review found no code-level release blocker. Its deployment-risk and cleanup documentation findings were corrected; artifact integrity, stack compatibility and runtime-only SSO configuration also received focused fixes and regression checks. A bounded follow-up found no actionable defects in the integrity and stack gates. The reviewed code at `2d6bd3e` passed [fresh-clone CI](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/runs/43071146059). This evidence-only documentation update changes no application or deployment code. Use the [latest workflow run](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/workflows/verify.yml) for subsequent revisions. Every deployment must complete the signed-in checks in [the deployment guide](deploy.md).
 
 ## Built-artifact security assessment
 
@@ -25,11 +25,11 @@ The Market's RabbitMQ client was upgraded to the official [5.37.1 maintenance re
 
 ### Artifact identities
 
-These hashes identify the local scan inputs; source-built outputs from other toolchains may differ. The preparation journal records each build's actual digests.
+These hashes identify the local scan inputs; source-built outputs may differ with toolchains or embedded Git build metadata. The preparation journal records each build's actual digests.
 
 | Artifact | SHA-256 |
 | --- | --- |
 | oauth2-proxy | `cbaad42f283a1f729ced94b39f7c453039c3aa8d20c9a44c6ff67a4f02072fb2` |
 | northstar-market | `babc830f5087fce90f0c2e167dafced13b628009567d5f5a86560624b92274ca` |
-| demo-guide | `4d64d028a1d93ba26630a56951f4e0127708dd4590ac32f7326f468f9a341241` |
-| hub-mcp-relay | `02eca50f2182669dd93ab2c06b793018a675d8d5a1efe2afb8bf464774deb2b8` |
+| demo-guide | `a9981dde36ca283fad207eaefe0578e14a5e1d06e79d258f511807d2ea3c16e7` |
+| hub-mcp-relay | `4f4d75b3161a8554ab9efbc2baf61d9fd573c0be7abe977935b7c19e630caa59` |
