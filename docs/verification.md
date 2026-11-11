@@ -1,6 +1,6 @@
 # Verification record
 
-Checked on 11 November 2026. This is a source release candidate; authenticated acceptance on an independent foundation is still pending. Local results do not certify a model, native memory or Hub grant in your environment.
+Checked on 11 November 2026. This is a source release candidate. Core authenticated flows passed on an independent foundation; optional Hub inventory acceptance remains pending its foundation callback configuration and personal consent. Results do not certify a model, native memory or Hub grant in your environment.
 
 ## Local checks completed
 
@@ -11,6 +11,32 @@ Checked on 11 November 2026. This is a source release candidate; authenticated a
 - Gitleaks 8.30.1 reported no findings in the selected source export or initial clean Git history. Old repository history, local profiles, state, credentials, logs and build caches are excluded from this new repository.
 
 Independent review found no code-level release blocker. Its deployment-risk and cleanup documentation findings were corrected; artifact integrity, stack compatibility and runtime-only SSO configuration also received focused fixes and regression checks. A bounded follow-up found no actionable defects in the integrity and stack gates. The reviewed code at `2d6bd3e` passed [fresh-clone CI](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/runs/43071146059). This evidence-only documentation update changes no application or deployment code. Use the [latest workflow run](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/workflows/verify.yml) for subsequent revisions. Every deployment must complete the signed-in checks in [the deployment guide](deploy.md).
+
+## Independent foundation rehearsal
+
+Deployed phase 4 from this standalone kit into a newly created, isolated space on
+a second foundation. The operator explicitly accepted the unresolved proxy risk
+below for this rehearsal only. The original deployment was not changed.
+
+- The guide and native agent admitted the allowed presenter through SSO with
+  verified email still required. A real model response completed.
+- An agent-originated `northstar_search_products` call returned the three
+  expected Produce products and SKUs through the MCP Gateway.
+- Native `save_memory` stored a unique synthetic fact. In a separate new
+  conversation, `search_memories` retrieved its saved value without that value
+  being supplied in the retrieval prompt.
+- The unauthenticated agent API was denied. Temporarily excluding the signed-in
+  presenter from the guide's allowlist produced HTTP 403. The original allowlist
+  was restored exactly and allowed admission was verified again.
+- The optional Hub client, internal relay, gateway OAuth binding and descriptor
+  deployed. The personal consent flow exposed a missing exact foundation SSO
+  callback; no read-only Hub inventory success is claimed yet. Follow the
+  [environment-specific prerequisites](hub-oauth.md).
+- Cleanup was previewed only; no service data was deleted.
+
+Observed platform components: Agent Buildpack 0.2.39, Java Buildpack 5.0.0,
+Binary Buildpack 1.1.95, and `tanzucflinuxfs1`. These are observed rehearsal
+versions, not a promise of compatibility with every platform release.
 
 ## Built-artifact security assessment
 

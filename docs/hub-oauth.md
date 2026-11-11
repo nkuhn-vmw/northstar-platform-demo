@@ -65,10 +65,18 @@ Reconnect in Copilot and request the applications in your own org and space,
 explicitly using read-only operations. Inspect the actual tool result. A healthy
 app, successful consent or discovered tool list alone is not inventory acceptance.
 
-SSO and CF roles are environment-specific. An empty resource picker means the
-presenter needs appropriate access to the store's space; the kit does not grant
-roles. An identity-provider callback error needs an operator to register the exact
-HTTPS callback for that Hub/gateway flow. Never widen those callbacks to a wildcard or use a shared personal token. The separate native agent SSO client uses a redirect pattern restricted to its own exact application origin to support the platform runtime's login paths.
+SSO and CF roles are environment-specific. For an empty resource picker, verify
+the presenter's access to the store's space and allow Hub to discover newly
+created bindings before refreshing the page. The kit does not grant roles.
+An identity-provider callback error needs an operator to register the exact
+HTTPS callback shown in the rejected authorization request. The foundation login
+in this flow may use `https://uaa.<system-domain>/login/callback/<origin>` even
+when the identity provider already permits the corresponding `login` hostname.
+This foundation callback is separate from the installation's gateway callback
+registered above. Preserve existing entries and permissions; never widen
+callbacks to a wildcard or use a shared personal token. The separate native agent
+SSO client uses a redirect pattern restricted to its own exact application origin
+to support the platform runtime's login paths.
 If a connection is not ready, switch it off in your session to keep other scenes
 usable. Hub retains the user's existing permissions; the demo's read-only prompt
 is not an authorization boundary for every tool Hub may expose.
