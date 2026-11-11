@@ -6,11 +6,22 @@ Checked on 11 November 2026. This is a source release candidate. Authenticated c
 
 - Prepared all four Linux/amd64 artifacts, verified official archive/executable hashes, source-tree pins and output digests.
 - Passed 69 Python orchestration, ownership, credential handling and launcher checks; both Go test suites; four Market integration tests on Java 21 / Spring Boot 4.1.2. `bin/verify --offline` passed with populated caches.
-- Checked the native phase/mode plans with Hub enabled and disabled, source syntax, package boundaries and 32 local documentation links.
+- Checked the native phase/mode plans with Hub enabled and disabled, source syntax, package boundaries and 33 local documentation links.
 - Interactively checked the loopback presenter guide, native architecture diagram and endpoint filtering. The rebuilt Market served its synthetic catalog and Produce filter returned three products. These were unauthenticated local previews.
 - Gitleaks 8.30.1 reported no findings in the selected source export or initial clean Git history. Old repository history, local profiles, state, credentials, logs and build caches are excluded from this new repository.
 
 Independent review found no code-level release blocker. Its deployment-risk and cleanup documentation findings were corrected; artifact integrity, stack compatibility and runtime-only SSO configuration also received focused fixes and regression checks. A bounded follow-up found no actionable defects in the integrity and stack gates. The reviewed code at `2d6bd3e` passed [fresh-clone CI](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/runs/43071146059). This evidence-only documentation update changes no application or deployment code. Use the [latest workflow run](https://github.com/nkuhn-vmw/northstar-platform-demo/actions/workflows/verify.yml) for subsequent revisions. Every deployment must complete the signed-in checks in [the deployment guide](deploy.md).
+
+A final publication audit covered the candidate source, all advertised Git refs
+and all eight available Actions log archives. No credentials or private deployment
+identifiers were found in that material. Two log scanner matches were the published
+SSO proxy checksum. The four PNGs exposed no text/EXIF metadata through Pillow;
+the Gradle wrapper's manifest and archive paths contained no private identifiers.
+The retained oauth2-proxy license was byte-for-byte identical to its pinned
+upstream version. The Apache license appendix uses its standard placeholder;
+the project's attribution remains in NOTICE. Independent review found no
+publication blocker. This is not a vulnerability-free certification, and the
+runtime findings below still require an operator decision.
 
 ## Independent foundation rehearsal
 
